@@ -590,6 +590,7 @@ function showQuickStartModal() {
     const okBtn = document.getElementById('qs-ok');
     const toSchedules = document.getElementById('qs-open-schedules');
     const dontShow = document.getElementById('qs-dont-show');
+    const dontShowWrap = document.getElementById('qs-dont-show-wrap');
     if (closeBtn) closeBtn.onclick = () => {
         if (dontShow && dontShow.checked) persistDontShowQuickStart();
         close();
@@ -615,6 +616,8 @@ function persistDontShowQuickStart() {
 function maybeShowQuickStartOnboarding() {
     // Show if enabled in config; default true for first run
     if (currentConfig && currentConfig.showQuickStartOnLaunch !== false) {
+        const dontShowWrap = document.getElementById('qs-dont-show-wrap');
+        if (dontShowWrap) dontShowWrap.style.display = 'flex';
         showQuickStartModal();
     }
 }
@@ -622,6 +625,8 @@ function maybeShowQuickStartOnboarding() {
 // Always-available entry point
 function openQuickStart() {
     const dontShow = document.getElementById('qs-dont-show');
+    const dontShowWrap = document.getElementById('qs-dont-show-wrap');
     if (dontShow) dontShow.checked = false; // not to persist by default when opening manually
+    if (dontShowWrap) dontShowWrap.style.display = 'none';
     showQuickStartModal();
 }
