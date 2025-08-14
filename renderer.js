@@ -618,3 +618,10 @@ function maybeShowQuickStartOnboarding() {
         showQuickStartModal();
     }
 }
+
+// Always-available entry point
+function openQuickStart() {
+    const dontShow = document.getElementById('qs-dont-show');
+    if (dontShow) dontShow.checked = false; // not to persist by default when opening manually
+    showQuickStartModal();
+}
