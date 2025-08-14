@@ -1,6 +1,6 @@
 {
   "name": "ccpulse",
-  "version": "1.0.5",
+  "version": "1.0.0",
   "description": "Keep your Claude token window alive with periodic pulses.",
   "main": "main.js",
   "scripts": {
