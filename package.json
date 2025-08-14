@@ -1,0 +1,49 @@
+{
+  "name": "ccpulse",
+  "version": "1.0.5",
+  "description": "Keep your Claude token window alive with periodic pulses.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "dist": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "cli": "node cli.js",
+    "cli:real": "node cli.js --real"
+  },
+  "author": "Rene Choi (renechoi)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/renechoi/ccpulse.git"
+  },
+  "bugs": {
+    "url": "https://github.com/renechoi/ccpulse/issues"
+  },
+  "homepage": "https://github.com/renechoi/ccpulse#readme",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.4.5"
+  },
+  "build": {
+    "appId": "com.claude.ccpulse",
+    "productName": "CCPulse",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    }
+  }
+}

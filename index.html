@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CCPulse</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100vh; overflow: hidden; }
+        .container { display: flex; height: 100vh; }
+        .sidebar { width: 200px; padding: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.1); }
+        .logo { text-align: center; margin-bottom: 30px; }
+        .logo h1 { font-size: 24px; color: #667eea; margin-bottom: 5px; }
+        .logo p { font-size: 12px; color: #666; }
+        .nav-button { width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 10px; cursor: pointer; transition: all 0.25s ease; font-size: 14px; }
+        .nav-button:hover { transform: translateY(-1px); }
+        .nav-button.active { transform: translateY(-1px); }
+        .main-content { flex: 1; padding: 30px; overflow-y: auto; }
+        .page { display: none; border-radius: 16px; padding: 30px; min-height: calc(100vh - 60px); }
+        .page.active { display: block; }
+        .page-title { font-size: 28px; margin-bottom: 25px; padding-bottom: 10px; border-bottom-width: 2px; border-bottom-style: solid; }
+        .status-card { color: white; padding: 25px; border-radius: 14px; margin-bottom: 25px; }
+        .status-row { display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .status-label { font-weight: 500; opacity: 0.9; }
+        .status-value { font-weight: bold; font-size: 18px; }
+        .status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+        .status-indicator.active { animation: pulse 2s infinite; }
+        .status-indicator.inactive { background: #f44336; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(76, 175, 80, 0); } 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0); } }
+        .action-buttons { display: flex; gap: 15px; margin-bottom: 25px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.25s ease; display: flex; align-items: center; gap: 8px; }
+        .btn-primary { color: white; }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .btn-success { color: white; }
+        .btn-success:hover { transform: translateY(-2px); }
+        .btn-danger { color: white; }
+        .btn-danger:hover { transform: translateY(-2px); }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: #555; }
+        .form-control { width: 100%; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
+        .form-control:focus { outline: none; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; }
+        .checkbox-group input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
+        .logs-container { border-radius: 10px; padding: 15px; height: 400px; overflow-y: auto; font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; line-height: 1.6; }
+        .log-entry { margin-bottom: 8px; padding: 8px; border-radius: 6px; border-left-width: 3px; border-left-style: solid; }
+        .log-timestamp { color: #666; font-size: 11px; }
+        .log-message { margin-top: 4px; }
+        .info-box { padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left-width: 4px; border-left-style: solid; }
+        .info-box h3 { margin-bottom: 10px; color: #1976d2; }
+        .info-box p { color: #555; line-height: 1.6; }
+        .footer { margin-top: 30px; padding-top: 20px; text-align: center; font-size: 12px; }
+        /* Theme variables and overrides */
+        :root { --bg-start: #0f172a; --bg-end: #1e293b; --text: #e5e7eb; --muted: #9ca3af; --surface: rgba(255,255,255,0.06); --surface-2: rgba(255,255,255,0.08); --border: rgba(255,255,255,0.12); --primary: #7c3aed; --primary-600: #6d28d9; --success: #22c55e; --success-600: #16a34a; --danger: #ef4444; --danger-600: #dc2626; --code-bg: #0b1220; --info-bg: rgba(59,130,246,0.12); --info-border: #60a5fa; --warning-bg: rgba(234,179,8,0.15); --warning-border: #f59e0b; }
+        body { color: var(--text); background: radial-gradient(60% 80% at 10% 20%, rgba(124,58,237,0.25) 0%, transparent 60%), radial-gradient(70% 80% at 90% 10%, rgba(2,132,199,0.22) 0%, transparent 60%), linear-gradient(160deg, var(--bg-start) 0%, var(--bg-end) 100%); }
+        .sidebar { background: var(--surface); border-right: 1px solid var(--border); backdrop-filter: blur(8px); }
+        .page { background: var(--surface-2); border: 1px solid var(--border); }
+        .page-title { color: var(--text); border-bottom-color: var(--border); }
+        .nav-button { background: var(--surface); border: 1px solid var(--border); color: var(--text); }
+        .nav-button:hover, .nav-button.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 8px 24px rgba(124,58,237,0.35); }
+        .status-card { background: linear-gradient(135deg, rgba(124,58,237,0.35) 0%, rgba(2,132,199,0.35) 100%); box-shadow: 0 10px 30px rgba(0,0,0,0.25); }
+        .status-label { color: rgba(255,255,255,0.85); }
+        .status-value { color: #fff; }
+        .status-indicator.active { background: var(--success); }
+        .status-indicator.inactive { background: var(--danger); }
+        .btn-primary { background: var(--primary); box-shadow: 0 6px 18px rgba(124,58,237,0.35); }
+        .btn-primary:hover { background: var(--primary-600); }
+        .btn-success { background: var(--success); box-shadow: 0 6px 18px rgba(34,197,94,0.35); }
+        .btn-success:hover { background: var(--success-600); }
+        .btn-danger { background: var(--danger); box-shadow: 0 6px 18px rgba(239,68,68,0.35); }
+        .btn-danger:hover { background: var(--danger-600); }
+        .form-control { background: rgba(0,0,0,0.25); color: var(--text); border-color: var(--border); }
+        .form-control::placeholder { color: var(--muted); }
+        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(124,58,237,0.25); }
+        .logs-container { background: var(--code-bg); color: #e2e8f0; border: 1px solid var(--border); }
+        .log-entry { background: rgba(255,255,255,0.03); border-left-color: var(--primary); }
+        .log-timestamp { color: var(--muted); }
+        .info-box { background: var(--info-bg); border-left-color: var(--info-border); }
+        #mode-warning { background: var(--warning-bg) !important; border-left-color: var(--warning-border) !important; }
+        .footer { color: var(--muted); border-top: 1px solid var(--border); }
+        /* Settings layout refinements */
+        .settings-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 18px; align-items: start; }
+        @media (max-width: 960px) { .settings-grid { grid-template-columns: 1fr; } }
+        .settings-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+        .form-hint { display: block; margin-top: 6px; font-size: 12px; color: var(--muted); }
+        .toggle-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--border); }
+        .toggle-row:last-child { border-bottom: none; }
+        .toggle-title { font-weight: 600; }
+        .toggle-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+        .action-bar { margin-top: 18px; display: flex; justify-content: flex-end; }
+        /* Subtle inline hint under titles */
+        .subtle-hint-inline { display: block; font-size: 12px; color: var(--muted); margin-top: 6px; font-weight: normal; }
+    </style>
+</head>
+<body class="dark">
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h1>💙 CCPulse</h1>
+                <p>Claude Code Pulse</p>
+            </div>
+            <button class="nav-button active" onclick="showPage('dashboard')">📊 <span data-i18n="dashboard">대시보드</span></button>
+            <button class="nav-button" onclick="showPage('settings')">⚙️ <span data-i18n="settings">설정</span></button>
+            <button class="nav-button" onclick="showPage('schedules')">🗓️ <span data-i18n="schedules">스케줄</span></button>
+            <button class="nav-button" onclick="showPage('logs')">📝 <span data-i18n="logs">로그</span></button>
+            <button class="nav-button" onclick="showPage('about')">ℹ️ <span data-i18n="about">정보</span></button>
+            <hr style="border: none; border-top: 1px solid var(--border); margin: 14px 0;">
+            <button class="nav-button" id="lang-toggle" onclick="toggleLanguage()">🌐 EN/KO</button>
+        </div>
+        <div class="main-content">
+            <!-- 대시보드 -->
+            <div id="dashboard" class="page active">
+                <h2 class="page-title" data-i18n="dashboard">대시보드</h2>
+                <div class="status-card">
+                    <div class="status-row">
+                        <span class="status-label" data-i18n="currentStatus">현재 상태</span>
+                        <span class="status-value"><span id="status-indicator" class="status-indicator inactive"></span><span id="status-text" data-i18n="inactive">비활성</span></span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label" data-i18n="nextRunTime">다음 실행 시간</span>
+                        <span class="status-value" id="next-run">-</span>
+                    </div>
+                    <div class="status-row">
+                        <span class="status-label" data-i18n="runMode">실행 모드</span>
+                        <span class="status-value" id="run-mode" style="font-weight: bold;">Mock Mode</span>
+                    </div>
+                </div>
+                <div class="info-box" id="schedules-summary" style="margin-top: 16px;">
+                    <h3 style="margin-bottom:10px;" data-i18n="activeSchedules">활성 스케줄</h3>
+                    <div id="schedules-summary-list" style="display:flex; flex-direction:column; gap:10px;">
+                        <div style="color: var(--muted);" data-i18n="noSchedules">스케줄이 없습니다. 스케줄 탭에서 추가 후 저장하세요.</div>
+                    </div>
+                </div>
+                <div class="info-box" id="next-runs-box" style="margin-top: 12px;">
+                    <h3 style="margin-bottom:10px;" data-i18n="nextRuns">다음 실행(최대 5회)</h3>
+                    <div id="next-runs-list" style="display:flex; flex-wrap:wrap; gap:8px;">
+                        <span style="color: var(--muted);" data-i18n="noAutoRun">자동 실행이 꺼져 있거나 스케줄이 없습니다.</span>
+                    </div>
+                </div>
+                <div class="info-box" id="mode-warning" style="background: #fff3cd; border-left-color: #ffc107; margin-bottom: 20px;">
+                    <h3 style="color: #856404;">⚠️ <span data-i18n="mockModeWarning">현재 Mock 모드로 실행 중</span></h3>
+                    <p style="color: #856404;"><span data-i18n="mockModeDesc">실제로 Claude를 호출하지 않고 시뮬레이션만 합니다.</span><br><span data-i18n="mockModeHint">실제 실행을 원하시면 설정에서 Mock 모드를 끄세요.</span></p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn btn-success" onclick="runNow()">▶️ <span data-i18n="runNow">지금 실행</span></button>
+                    <button class="btn btn-primary" onclick="toggleAutoStart()">⏰ <span data-i18n="toggleAutoRun">자동 실행 전환</span></button>
+                    <button class="btn btn-primary" onclick="showPage('logs');">📝 <span data-i18n="viewLogs">로그 보기</span></button>
+                </div>
+                <div class="info-box">
+                    <h3>📌 <span data-i18n="quickStartGuide">빠른 시작 가이드</span></h3>
+                    <p>
+                        1. <span data-i18n="quickStart1"><strong>스케줄</strong> 탭에서 원하는 스케줄을 추가하고 저장하세요.</span><br>
+                        2. <span data-i18n="quickStart2"><strong>설정</strong> 탭에서 <strong>자동 실행 활성화</strong>를 켜세요.</span><br>
+                        3. <span data-i18n="quickStart3">대시보드의 <strong>지금 실행</strong>으로 즉시 동작을 테스트할 수 있습니다.</span><br>
+                        4. <span data-i18n="quickStart4">창을 닫아도 트레이에서 계속 실행됩니다(메뉴로 다시 열기 가능).</span>
+                    </p>
+                </div>
+            </div>
+            <!-- 설정 -->
+            <div id="settings" class="page">
+                <h2 class="page-title" data-i18n="settings">설정</h2>
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <div class="form-group">
+                            <label data-i18n="claudeMessage">Claude 메시지</label>
+                            <input type="text" id="message" class="form-control" placeholder="Hello">
+                            <small class="form-hint" data-i18n="claudeMessageHint">실제 호출 시 Claude에 전송되는 단일 메시지입니다.</small>
+                        </div>
+                    </div>
+                    <div class="settings-card">
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-title" data-i18n="autoRunEnable">자동 실행 활성화</div>
+                                <div class="toggle-desc" data-i18n="autoRunDesc">스케줄 탭의 설정된 스케줄 기준으로 자동 실행합니다.</div>
+                            </div>
+                            <input type="checkbox" id="auto-start">
+                        </div>
+                        <div class="toggle-row">
+                            <div>
+                                <div class="toggle-title" data-i18n="mockMode">Mock 모드</div>
+                                <div class="toggle-desc" data-i18n="mockModeDescSetting">테스트용으로 Claude를 실제 호출하지 않습니다. 해제 시 실제로 실행됩니다.</div>
+                            </div>
+                            <input type="checkbox" id="mock-mode">
+                        </div>
+                    </div>
+                </div>
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="saveSettings()">💾 <span data-i18n="saveSettings">설정 저장</span></button>
+                </div>
+            </div>
+            <!-- 스케줄 -->
+            <div id="schedules" class="page">
+                <h2 class="page-title" data-i18n="schedules">스케줄
+                    <span class="subtle-hint-inline" data-i18n="schedulesHint">24시간 표기(HH:MM), 로컬 시간대 기준</span>
+                </h2>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="addSchedule()">➕ <span data-i18n="addSchedule">스케줄 추가</span></button>
+                    <button class="btn btn-primary" onclick="addPreset('every15')">⏱️ <span data-i18n="preset15min">15분 간격</span></button>
+                    <button class="btn btn-primary" onclick="addPreset('hourly')">⏱️ <span data-i18n="presetHourly">매시간</span></button>
+                    <button class="btn btn-primary" onclick="addPreset('workday')">🗂️ <span data-i18n="presetWorkday">평일 9-18시/30분</span></button>
+                </div>
+                <div id="schedules-container"></div>
+                <div class="action-buttons" style="margin-top: 20px;">
+                    <button class="btn btn-success" onclick="saveSchedulesUI()"><span data-i18n="save">저장</span></button>
+                    <button class="btn btn-danger" onclick="clearSchedulesUI()">🧹 <span data-i18n="clearAll">초기화</span></button>
+                </div>
+            </div>
+            <!-- 로그 -->
+            <div id="logs" class="page">
+                <h2 class="page-title" data-i18n="executionLogs">실행 로그</h2>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="refreshLogs()">🔄 <span data-i18n="refresh">새로고침</span></button>
+                    <button class="btn btn-danger" onclick="clearLogs()">🗑️ <span data-i18n="clearLogs">로그 삭제</span></button>
+                    <button class="btn btn-primary" onclick="openLogsFolder()">📁 <span data-i18n="openLogFolder">로그 폴더 열기</span></button>
+                </div>
+                <div class="logs-container" id="logs-container"><span data-i18n="noLogs">로그가 없습니다.</span></div>
+            </div>
+            <!-- 정보 -->
+            <div id="about" class="page">
+                <h2 class="page-title" data-i18n="about">정보</h2>
+                <div class="info-box">
+                    <h3 data-i18n="version">CCPulse v1.0.0</h3>
+                    <p>
+                        <span data-i18n="description">Claude Code의 토큰 리셋 타이밍을 관리하는 도구입니다.</span><br><br>
+                        <strong data-i18n="features">주요 기능:</strong><br>
+                        • <span data-i18n="feature1">매일 설정된 시간에 자동으로 Claude에 요청 전송</span><br>
+                        • <span data-i18n="feature2">토큰 윈도우 카운팅 시작 시점 조절</span><br>
+                        • <span data-i18n="feature3">시스템 트레이에서 백그라운드 실행</span><br>
+                        • <span data-i18n="feature4">Mock 모드로 Claude 없이도 테스트 가능</span>
+                    </p>
+                </div>
+                <div class="footer">
+                    <p data-i18n="copyright">© 2025 renechoi. All rights reserved.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="translations.js"></script>
+    <script src="renderer.js"></script>
+    <script>
+        function toggleLanguage() {
+            const currentLang = localStorage.getItem('ccpulse-language') || 'en';
+            const newLang = currentLang === 'ko' ? 'en' : 'ko';
+            localStorage.setItem('ccpulse-language', newLang);
+            currentLanguage = newLang;
+            updateUILanguage();
+            
+            if (typeof updateDashboard !== 'undefined') {
+                updateDashboard();
+            }
+            
+            if (typeof renderSchedules !== 'undefined') {
+                renderSchedules();
+            }
+            
+            if (typeof require !== 'undefined') {
+                const { ipcRenderer } = require('electron');
+                ipcRenderer.send('update-language', newLang);
+            }
+        }
+        
+        function updateUILanguage() {
+            const lang = currentLanguage;
+            
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    element.textContent = translations[lang][key];
+                }
+            });
+            
+            const langBtn = document.getElementById('lang-toggle');
+            if (langBtn) {
+                langBtn.textContent = lang === 'en' ? '🌐 KO' : '🌐 EN';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedLang = localStorage.getItem('ccpulse-language') || 'en';
+            currentLanguage = savedLang;
+            updateUILanguage();
+        });
+    </script>
+</body>
+</html>

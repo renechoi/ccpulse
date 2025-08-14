@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# Local env/config
+*.local
+.env
+.env.*
+
+# Electron/Tooling caches (if present)
+.electron/
+.cache/
+
+# IDE/editor settings (do not commit personal configs)
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
