@@ -75,6 +75,9 @@ const translations = {
         quickStart2: 'Enable Auto-run in the Settings tab.',
         quickStart3: 'Test immediately with Run Now on the dashboard.',
         quickStart4: 'Even if closed, it continues running in the tray (can reopen from menu).',
+        dontShowAgain: 'Don\'t show again',
+        goToSchedules: 'Go to Schedules',
+        gotIt: 'Got it',
         
         // Buttons
         runNow: 'Run Now',
@@ -193,6 +196,9 @@ const translations = {
         quickStart2: '설정 탭에서 자동 실행 활성화를 켜세요.',
         quickStart3: '대시보드의 지금 실행으로 즉시 동작을 테스트할 수 있습니다.',
         quickStart4: '창을 닫아도 트레이에서 계속 실행됩니다(메뉴로 다시 열기 가능).',
+        dontShowAgain: '다시 보지 않기',
+        goToSchedules: '스케줄로 이동',
+        gotIt: '확인',
         
         // Buttons
         runNow: '지금 실행',

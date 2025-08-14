@@ -425,6 +425,9 @@ window.addEventListener('DOMContentLoaded', () => {
             }
         } catch (_) {}
         initSchedulesUI();
+        try {
+            maybeShowQuickStartOnboarding();
+        } catch (_) {}
     });
     
     setInterval(updateDashboard, 5000);
@@ -441,6 +444,7 @@ ipcRenderer.on('init-config', (_event, initConfig) => {
         document.getElementById('auto-start').checked = currentConfig.autoStart;
         document.getElementById('mock-mode').checked = currentConfig.mockMode;
     } catch (_) {}
+    try { maybeShowQuickStartOnboarding(); } catch (_) {}
 });
 
 
@@ -574,4 +578,43 @@ function clearSchedulesUI() {
     localStorage.removeItem('ccpulse_schedules');
     renderSchedules();
     updateDashboard();
+}
+
+// ===== Onboarding (first run quick start) =====
+function showQuickStartModal() {
+    const m = document.getElementById('quickstart-modal');
+    if (!m) return;
+    m.style.display = 'flex';
+    const close = () => { m.style.display = 'none'; };
+    const closeBtn = document.getElementById('qs-close-btn');
+    const okBtn = document.getElementById('qs-ok');
+    const toSchedules = document.getElementById('qs-open-schedules');
+    const dontShow = document.getElementById('qs-dont-show');
+    if (closeBtn) closeBtn.onclick = () => {
+        if (dontShow && dontShow.checked) persistDontShowQuickStart();
+        close();
+    };
+    if (okBtn) okBtn.onclick = () => {
+        if (dontShow && dontShow.checked) persistDontShowQuickStart();
+        close();
+    };
+    if (toSchedules) toSchedules.onclick = () => {
+        if (dontShow && dontShow.checked) persistDontShowQuickStart();
+        close();
+        showPage('schedules');
+    };
+}
+
+function persistDontShowQuickStart() {
+    try {
+        currentConfig.showQuickStartOnLaunch = false;
+        ipcRenderer.send('save-config', { showQuickStartOnLaunch: false });
+    } catch (_) {}
+}
+
+function maybeShowQuickStartOnboarding() {
+    // Show if enabled in config; default true for first run
+    if (currentConfig && currentConfig.showQuickStartOnLaunch !== false) {
+        showQuickStartModal();
+    }
 }

@@ -145,15 +145,7 @@
                     <button class="btn btn-primary" onclick="toggleAutoStart()">⏰ <span data-i18n="toggleAutoRun">자동 실행 전환</span></button>
                     <button class="btn btn-primary" onclick="showPage('logs');">📝 <span data-i18n="viewLogs">로그 보기</span></button>
                 </div>
-                <div class="info-box">
-                    <h3>📌 <span data-i18n="quickStartGuide">빠른 시작 가이드</span></h3>
-                    <p>
-                        1. <span data-i18n="quickStart1"><strong>스케줄</strong> 탭에서 원하는 스케줄을 추가하고 저장하세요.</span><br>
-                        2. <span data-i18n="quickStart2"><strong>설정</strong> 탭에서 <strong>자동 실행 활성화</strong>를 켜세요.</span><br>
-                        3. <span data-i18n="quickStart3">대시보드의 <strong>지금 실행</strong>으로 즉시 동작을 테스트할 수 있습니다.</span><br>
-                        4. <span data-i18n="quickStart4">창을 닫아도 트레이에서 계속 실행됩니다(메뉴로 다시 열기 가능).</span>
-                    </p>
-                </div>
+                <!-- Quick Start is shown in a first-run modal instead of here -->
             </div>
             <!-- 설정 -->
             <div id="settings" class="page">
@@ -280,5 +272,30 @@
             updateUILanguage();
         });
     </script>
+    <!-- Onboarding Modal -->
+    <div id="quickstart-modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); align-items: center; justify-content: center; z-index: 1000;">
+        <div style="width: min(640px, 92vw); background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.35); overflow: hidden;">
+            <div style="padding: 18px 20px; border-bottom: 1px solid var(--border); display:flex; align-items:center; justify-content:space-between;">
+                <h3 style="margin:0;">📌 <span data-i18n="quickStartGuide">빠른 시작 가이드</span></h3>
+                <button id="qs-close-btn" class="btn" style="background: transparent; color: var(--text);">✖</button>
+            </div>
+            <div style="padding: 20px;">
+                <ol style="line-height:1.8;">
+                    <li><span data-i18n="quickStart1">스케줄 탭에서 원하는 스케줄을 추가하고 저장하세요.</span></li>
+                    <li><span data-i18n="quickStart2">설정 탭에서 자동 실행 활성화를 켜세요.</span></li>
+                    <li><span data-i18n="quickStart3">대시보드의 지금 실행으로 즉시 동작을 테스트할 수 있습니다.</span></li>
+                    <li><span data-i18n="quickStart4">창을 닫아도 트레이에서 계속 실행됩니다(메뉴로 다시 열기 가능).</span></li>
+                </ol>
+                <label class="checkbox-group" style="margin-top: 12px; display:flex; align-items:center; gap:8px;">
+                    <input type="checkbox" id="qs-dont-show">
+                    <span data-i18n="dontShowAgain">다시 보지 않기</span>
+                </label>
+                <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:16px;">
+                    <button id="qs-open-schedules" class="btn btn-primary"><span data-i18n="goToSchedules">스케줄로 이동</span></button>
+                    <button id="qs-ok" class="btn btn-success"><span data-i18n="gotIt">확인</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

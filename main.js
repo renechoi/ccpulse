@@ -23,7 +23,8 @@ let config = {
     autoStart: false,
     mockMode: false, // 기본값을 실모드로 (사용자가 필요 시 Mock 선택)
     openTerminalWindow: true, // Real 모드에서 터미널 창을 띄워 실행
-    schedules: []
+    schedules: [],
+    showQuickStartOnLaunch: true
 };
 
 const configPath = path.join(app.getPath('userData'), 'config.json');
