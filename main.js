@@ -119,7 +119,7 @@ function executeClaude() {
                 `  do script "${messageAS}" in selected tab of theWin`,
                 '  delay 0.5',
                 '  do script "" in selected tab of theWin',
-                '  delay 1.0',
+                '  delay 10.0',
                 '  -- Interrupt any ongoing generation (Esc, then Ctrl-C)\n',
                 '  activate',
                 '  tell application "System Events" to key code 53',
@@ -281,7 +281,7 @@ function executeClaude() {
                     addLog(`📤 Sending exit`);
                     try { claude.stdin.write('exit\n'); } catch (_) {}
                     try { claude.stdin.end(); } catch (_) {}
-                }, 1000);
+                }, 10000);
             }, 300);
         }, 2000);
         
