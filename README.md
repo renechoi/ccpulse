@@ -207,6 +207,10 @@ graph LR
     C -->|No| B
 ```
 
+### Execution timing
+- After sending the message to Claude, CCPulse waits 10 seconds before sending exit.
+- Rationale: Claude TUI may need a few seconds to register the first turn; this buffer prevents the session from closing too early.
+
 ## 🔗 Links
 
 - [Report Issues](https://github.com/renechoi/ccpulse/issues)
